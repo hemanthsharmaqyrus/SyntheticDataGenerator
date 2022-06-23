@@ -16,7 +16,7 @@ RUN unzip SyntheticDataGenerator.zip
 RUN python -m venv SyntheticDataGenerator
 WORKDIR SyntheticDataGenerator
 
-EXPOSE 9000
+EXPOSE 8055
 
 RUN pip install -r requirements.txt --no-cache-dir
 
