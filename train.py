@@ -25,30 +25,33 @@ writer = SummaryWriter()
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 '''load train data'''
-tokenized_inputs = np.load('data/tokenized_inputs_passwords_finetune.npy')
-tokenized_outputs = np.load('data/tokenized_outputs_passwords_finetune.npy')
+tokenized_inputs = np.load('generators/tokenized_inputs_v1_train.npy')
+tokenized_outputs = np.load('generators/tokenized_outputs_v1_train.npy')
 train_dataset = DataGeneratorTrainDataset(tokenized_inputs, tokenized_outputs)
 print('len of train data', len(train_dataset))
 
 '''load val data'''
-tokenized_inputs = np.load('data/tokenized_inputs_passwords_val.npy')
-tokenized_outputs = np.load('data/tokenized_outputs_passwords_val.npy')
+tokenized_inputs = np.load('generators/tokenized_inputs_v1_val.npy')
+tokenized_outputs = np.load('generators/tokenized_outputs_v1_val.npy')
 val_dataset = DataGeneratorTrainDataset(tokenized_inputs, tokenized_outputs)
 
 
-random_train_sampler = RandomSampler(train_dataset, num_samples=Config['num_samples'], replacement=True)
+#random_train_sampler = RandomSampler(train_dataset, num_samples=Config['num_samples'], replacement=True)
+# train_dataloader = DataLoader(train_dataset, batch_size=Config['batch_size'], \
+#         num_workers=Config['num_workers'], sampler = random_train_sampler)
+
 train_dataloader = DataLoader(train_dataset, batch_size=Config['batch_size'], \
-        num_workers=Config['num_workers'], sampler = random_train_sampler)
+         num_workers=Config['num_workers'])
 
 val_dataloader = DataLoader(val_dataset, batch_size=Config['batch_size'], num_workers=Config['num_workers'])
 
-saved_state_dict = torch.load('checkpoints/bbd2ec69-0e14-4428-aed6-3dced903fb07_least_loss_val.pth')
+#saved_state_dict = torch.load('checkpoints/bbd2ec69-0e14-4428-aed6-3dced903fb07_least_loss_val.pth')
 
-config = saved_state_dict['config']
-model = T5ForConditionalGeneration.from_pretrained(f"t5-{config['t5_model_type']}")
+#config = saved_state_dict['config']
+model = T5ForConditionalGeneration.from_pretrained(f"t5-{Config['t5_model_type']}")
 #model = T5ForConditionalGeneration(T5Config(vocab_size = tokenizer.vocab_size, decoder_start_token_id=tokenizer.get_vocab()['<pad>']))
 
-model.load_state_dict(saved_state_dict['model'])
+#model.load_state_dict(saved_state_dict['model'])
 model = model.train()
 model = model.to(device)
 log(f'lr {Config["lr"]}')
