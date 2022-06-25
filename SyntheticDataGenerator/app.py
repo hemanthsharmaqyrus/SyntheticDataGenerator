@@ -4,7 +4,6 @@ from pydantic import BaseModel
 import uvicorn
 from accessVerifier import verify_access_token
 from entity_generation_utils import get_similar_entity_from_model
-import uuid
 
 class Input(BaseModel):
     data: str
