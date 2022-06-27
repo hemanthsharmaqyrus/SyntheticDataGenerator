@@ -1,4 +1,5 @@
 
+from Config import Config
 import torch
 import torch.nn as nn
 import os
@@ -25,9 +26,12 @@ class DataGeneratorModel:
 
         #device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.device = torch.device('cpu')
-        
+
         #saved_state_dict = torch.load('bbd2ec69-0e14-4428-aed6-3dced903fb07_least_loss_val.pth', map_location=self.device)
+        # saved_state_dict = torch.load('checkpoints/37859b2d-f193-4f8e-be52-68beca12d12d_least_loss_train.pth', map_location=self.device)
+        #saved_state_dict = torch.load('checkpoints/517419db-e9a9-4701-91d9-5d1bb6835e11_least_loss_train.pth', map_location=self.device)
         saved_state_dict = torch.load(ModelInferenceConfig.model_path, map_location=self.device)
+        
         self.Config = saved_state_dict['config']
 
         #model = T5ForConditionalGeneration(T5Config(vocab_size = tokenizer.vocab_size, decoder_start_token_id=tokenizer.get_vocab()['<pad>']))
@@ -58,10 +62,11 @@ class DataGeneratorModel:
             def generate_new_data():
                 new_outputs = []
                 for i in range(top_k):
-                    outputs = self.model.generate(input_ids=sentence_input_ids, do_sample=True, top_k = 0, max_length=50, temperature=0.9)
+                    outputs = self.model.generate(input_ids=sentence_input_ids, do_sample=True, top_k = 0, max_length=50, temperature=0.9, top_p=0.4)
                     #outputs = self.model.generate(input_ids=sentence_input_ids)
                     #print('outputs',outputs)
                     output_word = self.tokenizer.decode(outputs.squeeze(0), skip_special_tokens=True)
+                    
                     new_outputs.append(output_word)
                 return new_outputs
 
@@ -93,6 +98,32 @@ class DataGeneratorModel:
 if __name__ == '__main__':
     datagenerator = DataGeneratorModel()
     start_time = time.time()
-    print(datagenerator.get_similar_entities('Last Authentication Date: 06-05-2020', 20))
-    print('time taken', time.time() - start_time)
+    # print(datagenerator.get_similar_entities('Last Authentication Date: 06-05-2020', 20))
+    # print(datagenerator.get_similar_entities('ID: KSG 001 81JG', 20))
+    # print(datagenerator.get_similar_entities('ID: KSG00181JG', 20))
+    # print(datagenerator.get_similar_entities('ID: KSG-001-81JG', 20))
+
+    # print(datagenerator.get_similar_entities('email: hemanths@gmail.com', 20))
+    # print(datagenerator.get_similar_entities('password: n@a13)912', 20))
+    # print(datagenerator.get_similar_entities('Id: 5', 20))
+    # print(datagenerator.get_similar_entities('Nation: USA', 20))
+    # print(datagenerator.get_similar_entities('credit card number: 4132 7238 2382 121', 20))
+    # print(datagenerator.get_similar_entities('credit card number: 4132 7238 2382 1214', 20))
+    # print(datagenerator.get_similar_entities('credit card number: 4132 7238 2382 12112', 20))
+    # print(datagenerator.get_similar_entities('credit card number: 4132-7238-2382-121', 20))
+    # print(datagenerator.get_similar_entities('credit card number: 4132-7238-2382-1214', 20))
+    # print(datagenerator.get_similar_entities('Name: Warren Buffet', 20))
+    # print(datagenerator.get_similar_entities('Phone num: +1 234 32422', 20))
+    # print(datagenerator.get_similar_entities('ID: +1 234 32422', 20))
+    
+
+    # print(datagenerator.get_similar_entities('Last Authentication Date: 06-05-2020', 20))
+    # print(datagenerator.get_similar_entities('Last Authentication Date: 06-05-2020', 20))
+    # import pandas as pd
+    # df = pd.read_csv('generators/val_data_v1.csv')
+    # for i in df['input_entity'].tolist():
+    #     print('input is', i)
+    #     print(datagenerator.get_similar_entities(i, 20))
+    # print('time taken', time.time() - start_time)
+
 

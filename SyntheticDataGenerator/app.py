@@ -3,8 +3,8 @@ from fastapi import FastAPI, Body, Header
 from pydantic import BaseModel
 import uvicorn
 from accessVerifier import verify_access_token
-from entity_generation_utils import get_similar_entity_from_model
-
+from entity_generation_utils import get_similar_entity_from_model, isModelFlag, get_similar_entity_from_conceptNet
+from memory_profiler import profile
 class Input(BaseModel):
     data: str
     count: int
@@ -91,7 +91,13 @@ async def gen_data(Authorization: str = Header(None), Login: str = Header(None),
         res_dict = {}
         for column_name, sample_value in data.items():
             column_data = str(column_name) + ': ' + str(sample_value)
-            res = get_similar_entity_from_model(column_data, data_count)
+
+            model_flag = isModelFlag(sample_value)
+            if model_flag:
+                res = get_similar_entity_from_model(column_data, data_count)
+            else:
+                res = get_similar_entity_from_conceptNet(column_data, data_count)
+            
             if res['status']:
                 res_dict[column_name] = res['data']
             else:
